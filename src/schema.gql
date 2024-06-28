@@ -1,0 +1,45 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+"""Character from Star Wars"""
+type Character {
+  episodes: [Episode!]!
+  id: Int!
+  name: String!
+  planet: Planet
+}
+
+input CreateCharacterInput {
+  episodeIds: [Int!]!
+  name: String!
+  planetId: Int
+}
+
+type Episode {
+  characters: [Character!]!
+  id: Int!
+  name: String!
+}
+
+type Mutation {
+  createCharacter(input: CreateCharacterInput!): Character!
+  deleteCharacter(id: Int!): Character!
+  updateCharacter(id: Int!, input: UpdateCharacterInput!): Character!
+}
+
+type Planet {
+  id: Int!
+  name: String!
+}
+
+type Query {
+  character(id: Int!): Character!
+  characters: [Character!]!
+}
+
+input UpdateCharacterInput {
+  episodeIds: [Int!]
+  name: String
+  planetId: Int
+}

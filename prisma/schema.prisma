@@ -1,0 +1,45 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Character {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  planetId Int?
+  planet   Planet?   @relation(fields: [planetId], references: [id])
+  episodes CharacterEpisode[]
+}
+
+model Episode {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  characters CharacterEpisode[]
+}
+
+model Planet {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  characters Character[]
+}
+
+model CharacterEpisode {
+  characterId Int
+  episodeId   Int
+
+  character   Character @relation(fields: [characterId], references: [id])
+  episode     Episode   @relation(fields: [episodeId], references: [id])
+
+  @@id([characterId, episodeId])
+}
+
