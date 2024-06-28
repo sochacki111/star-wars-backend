@@ -7,16 +7,20 @@ export class CharactersService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(): Promise<Character[]> {
-    return this.prisma.character.findMany({
-      include: { episodes: { include: { episode: true } }, planet: true },
-    });
+    return this.prisma.character
+      .findMany({
+        include: { episodes: { include: { episode: true } }, planet: true },
+      })
+      .then((chars) => chars.map((char) => this.mapCharacter(char)));
   }
 
   async findOne(id: number): Promise<Character | null> {
-    return this.prisma.character.findUnique({
-      where: { id },
-      include: { episodes: { include: { episode: true } }, planet: true },
-    });
+    return this.prisma.character
+      .findUnique({
+        where: { id },
+        include: { episodes: { include: { episode: true } }, planet: true },
+      })
+      .then((char) => this.mapCharacter(char));
   }
 
   async create(data: {
@@ -66,8 +70,36 @@ export class CharactersService {
       include: { episodes: { include: { episode: true } }, planet: true },
     });
 
-    return character;
+    return this.mapCharacter(character);
   }
+
+  private mapCharacter = (
+    character: {
+      planet: {
+        id: number;
+        name: string;
+      };
+      episodes: ({
+        episode: {
+          id: number;
+          name: string;
+        };
+      } & {
+        characterId: number;
+        episodeId: number;
+      })[];
+    } & {
+      id: number;
+      name: string;
+      planetId: number;
+    },
+  ) => ({
+    ...character,
+    episodes: character.episodes.map((episode) => ({
+      id: episode.episode.id,
+      name: episode.episode.name,
+    })),
+  });
 
   async update(
     id: number,
@@ -125,7 +157,7 @@ export class CharactersService {
       include: { episodes: { include: { episode: true } }, planet: true },
     });
 
-    return character;
+    return this.mapCharacter(character);
   }
 
   async remove(id: number): Promise<Character> {
