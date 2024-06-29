@@ -4,7 +4,7 @@
 
 """Character from Star Wars"""
 type Character {
-  episodes: [Episode!]!
+  episodes: [EpisodeSummary!]!
   id: Int!
   name: String!
   planet: Planet
@@ -16,8 +16,7 @@ input CreateCharacterInput {
   planetId: Int
 }
 
-type Episode {
-  characters: [Character!]!
+type EpisodeSummary {
   id: Int!
   name: String!
 }
@@ -28,6 +27,11 @@ type Mutation {
   updateCharacter(id: Int!, input: UpdateCharacterInput!): Character!
 }
 
+type PaginatedCharacters {
+  items: [Character!]!
+  nextCursor: String
+}
+
 type Planet {
   id: Int!
   name: String!
@@ -35,7 +39,7 @@ type Planet {
 
 type Query {
   character(id: Int!): Character!
-  characters: [Character!]!
+  characters(cursor: String, limit: Int! = 10): PaginatedCharacters!
 }
 
 input UpdateCharacterInput {

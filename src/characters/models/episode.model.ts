@@ -1,14 +1,10 @@
-import { ObjectType, Field, ID, Int } from '@nestjs/graphql';
-import { Character } from './character.model';
+import { ObjectType, Field, Int } from '@nestjs/graphql';
 
 @ObjectType()
-export class Episode {
+export class EpisodeSummary {
   @Field((type) => Int)
   id: number;
 
   @Field()
   name: string;
-
-  @Field((type) => [Character])
-  characters: Character[];
 }

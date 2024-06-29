@@ -1,17 +1,35 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Character } from '@prisma/client';
+import {
+  CursorPaginationArgs,
+  PaginatedCharacters,
+} from './dto/cursor-pagination.args';
+import { Character } from './models/character.model';
 
 @Injectable()
 export class CharactersService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(): Promise<Character[]> {
-    return this.prisma.character
+  async findMany(
+    paginationArgs: CursorPaginationArgs,
+  ): Promise<PaginatedCharacters> {
+    const { cursor, limit } = paginationArgs;
+    const characters = await this.prisma.character
       .findMany({
+        take: limit + 1,
+        cursor: cursor ? { id: +cursor } : undefined,
+        orderBy: { id: 'asc' }, // TODO implement sorting
         include: { episodes: { include: { episode: true } }, planet: true },
       })
       .then((chars) => chars.map((char) => this.mapCharacter(char)));
+
+    let nextCursor;
+    if (characters.length > limit) {
+      const nextCharacter = characters.pop();
+      nextCursor = nextCharacter.id.toString();
+    }
+
+    return { items: characters, nextCursor };
   }
 
   async findOne(id: number): Promise<Character | null> {
@@ -93,7 +111,7 @@ export class CharactersService {
       name: string;
       planetId: number;
     },
-  ) => ({
+  ): Character => ({
     ...character,
     episodes: character.episodes.map((episode) => ({
       id: episode.episode.id,
@@ -161,9 +179,11 @@ export class CharactersService {
   }
 
   async remove(id: number): Promise<Character> {
-    return this.prisma.character.delete({
-      where: { id },
-      include: { episodes: { include: { episode: true } }, planet: true },
-    });
+    return this.prisma.character
+      .delete({
+        where: { id },
+        include: { episodes: { include: { episode: true } }, planet: true },
+      })
+      .then((char) => this.mapCharacter(char));
   }
 }
