@@ -1,10 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import {
-  CursorPaginationArgs,
-  PaginatedCharacters,
-} from './dto/cursor-pagination.args';
 import { Character } from './models/character.model';
+import { CursorPaginationArgs } from 'src/common/pagination/dto/cursor-pagination.args';
+import { PaginatedCharacters } from './dto/paginated-characters';
 
 @Injectable()
 export class CharactersService {
@@ -18,7 +16,7 @@ export class CharactersService {
       .findMany({
         take: limit + 1,
         cursor: cursor ? { id: +cursor } : undefined,
-        orderBy: { id: 'asc' }, // TODO implement sorting
+        orderBy: { id: 'asc' },
         include: { episodes: { include: { episode: true } }, planet: true },
       })
       .then((chars) => chars.map((char) => this.mapCharacter(char)));
