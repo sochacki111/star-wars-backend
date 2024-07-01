@@ -8,7 +8,6 @@ import { CharactersRepositorySymbol } from './repositories/characters.repository
   providers: [
     CharactersService,
     CharactersResolver,
-    CharactersRepository,
     {
       provide: CharactersRepositorySymbol,
       useClass: CharactersRepository,
