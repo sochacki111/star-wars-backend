@@ -5,6 +5,7 @@ import { PrismaService } from '../../src/prisma/prisma.service';
 
 export let app: INestApplication;
 export let prisma: PrismaService;
+export let httpServer;
 
 beforeAll(async () => {
   const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -12,6 +13,7 @@ beforeAll(async () => {
   }).compile();
 
   app = moduleFixture.createNestApplication();
+  httpServer = app.getHttpServer();
   prisma = app.get<PrismaService>(PrismaService);
   await app.init();
 });

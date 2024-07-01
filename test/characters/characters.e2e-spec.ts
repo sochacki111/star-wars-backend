@@ -1,5 +1,5 @@
 import * as request from 'supertest';
-import { app, prisma } from '../common/setup';
+import { app, prisma, httpServer } from '../common/setup';
 
 const clearDb = async () => {
   await prisma.characterEpisode.deleteMany();
@@ -51,7 +51,7 @@ describe('Characters CRUD (e2e)', () => {
         }
       }
     `;
-    const response = await request(app.getHttpServer())
+    const response = await request(httpServer)
       .post(baseUrl)
       .send({ query: mutation });
 
@@ -75,7 +75,7 @@ describe('Characters CRUD (e2e)', () => {
         }
       }
     `;
-    const response = await request(app.getHttpServer())
+    const response = await request(httpServer)
       .post(baseUrl)
       .send({ query: mutation });
 
@@ -116,9 +116,7 @@ describe('Characters CRUD (e2e)', () => {
         }
       }
     `;
-    const response = await request(app.getHttpServer())
-      .post(baseUrl)
-      .send({ query });
+    const response = await request(httpServer).post(baseUrl).send({ query });
 
     expect(response.status).toBe(200);
     expect(response.body.data.character.name).toBe(characterName);
@@ -137,9 +135,7 @@ describe('Characters CRUD (e2e)', () => {
         }
       }
     `;
-    const response = await request(app.getHttpServer())
-      .post(baseUrl)
-      .send({ query });
+    const response = await request(httpServer).post(baseUrl).send({ query });
 
     expect(response.status).toBe(200);
     expect(response.body.errors[0].message).toContain(
@@ -170,7 +166,7 @@ describe('Characters CRUD (e2e)', () => {
         }
       }
     `;
-    const response = await request(app.getHttpServer())
+    const response = await request(httpServer)
       .post(baseUrl)
       .send({ query: mutation });
 
@@ -187,7 +183,7 @@ describe('Characters CRUD (e2e)', () => {
         }
       }
     `;
-    const response = await request(app.getHttpServer())
+    const response = await request(httpServer)
       .post(baseUrl)
       .send({ query: mutation });
 
@@ -220,7 +216,7 @@ describe('Characters CRUD (e2e)', () => {
         }
       }
     `;
-    const response = await request(app.getHttpServer())
+    const response = await request(httpServer)
       .post(baseUrl)
       .send({ query: mutation });
 
@@ -237,7 +233,7 @@ describe('Characters CRUD (e2e)', () => {
         }
       }
     `;
-    const response = await request(app.getHttpServer())
+    const response = await request(httpServer)
       .post(baseUrl)
       .send({ query: mutation });
 
