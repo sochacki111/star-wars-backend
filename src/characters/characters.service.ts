@@ -19,7 +19,7 @@ export class CharactersService {
     return this.charactersRepository.findMany(paginationArgs);
   }
 
-  async findOne(id: number): Promise<Character | null> {
+  async findOne(id: number): Promise<Character> {
     return this.charactersRepository.findOne(id);
   }
 

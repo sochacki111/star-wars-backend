@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CharactersRepositoryInterface } from '../characters.repository.interface';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { CursorPaginationArgs } from '../../../common/pagination/dto/cursor-pagination.args';
@@ -31,13 +31,17 @@ export class CharactersRepository implements CharactersRepositoryInterface {
     return { items: characters, nextCursor };
   }
 
-  async findOne(id: number): Promise<Character | null> {
-    return this.prisma.character
-      .findUnique({
-        where: { id },
-        include: { episodes: { include: { episode: true } }, planet: true },
-      })
-      .then((char) => this.mapCharacter(char));
+  async findOne(id: number): Promise<Character> {
+    const character = await this.prisma.character.findUnique({
+      where: { id },
+      include: { episodes: { include: { episode: true } }, planet: true },
+    });
+
+    if (!character) {
+      throw new NotFoundException(`Character with ID ${id} not found`);
+    }
+
+    return this.mapCharacter(character);
   }
 
   async create(data: {
@@ -47,7 +51,6 @@ export class CharactersRepository implements CharactersRepositoryInterface {
   }): Promise<Character> {
     const { name, episodeIds, planetId } = data;
 
-    // Check if character already exists
     const existingCharacter = await this.prisma.character.findUnique({
       where: { name },
     });
@@ -56,7 +59,6 @@ export class CharactersRepository implements CharactersRepositoryInterface {
       throw new Error(`Character with name ${name} already exists.`);
     }
 
-    // Ensure all episodes exist
     const episodes = await this.prisma.episode.findMany({
       where: { id: { in: episodeIds } },
     });
@@ -65,7 +67,6 @@ export class CharactersRepository implements CharactersRepositoryInterface {
       throw new Error(`One or more episode IDs are invalid.`);
     }
 
-    // Ensure planet exists if provided
     if (planetId) {
       const planet = await this.prisma.planet.findUnique({
         where: { id: planetId },
@@ -75,7 +76,6 @@ export class CharactersRepository implements CharactersRepositoryInterface {
       }
     }
 
-    // Create character with linked episodes and planet
     const character = await this.prisma.character.create({
       data: {
         name,
@@ -124,7 +124,6 @@ export class CharactersRepository implements CharactersRepositoryInterface {
   ): Promise<Character> {
     const { name, episodeIds, planetId } = data;
 
-    // Check if character exists
     const existingCharacter = await this.prisma.character.findUnique({
       where: { id },
     });
@@ -133,7 +132,6 @@ export class CharactersRepository implements CharactersRepositoryInterface {
       throw new Error(`Character with ID ${id} does not exist.`);
     }
 
-    // Ensure all episodes exist if provided
     if (episodeIds) {
       const episodes = await this.prisma.episode.findMany({
         where: { id: { in: episodeIds } },
@@ -144,7 +142,6 @@ export class CharactersRepository implements CharactersRepositoryInterface {
       }
     }
 
-    // Ensure planet exists if provided
     if (planetId) {
       const planet = await this.prisma.planet.findUnique({
         where: { id: planetId },
@@ -154,7 +151,6 @@ export class CharactersRepository implements CharactersRepositoryInterface {
       }
     }
 
-    // Update character with linked episodes and planet
     const character = await this.prisma.character.update({
       where: { id },
       data: {

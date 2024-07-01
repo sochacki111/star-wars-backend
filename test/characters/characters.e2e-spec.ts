@@ -59,6 +59,28 @@ describe('Characters CRUD (e2e)', () => {
     expect(response.body.data.createCharacter.episodes[1].name).toBe('EMPIRE');
   });
 
+  it('should not create a character with missing name', async () => {
+    const mutation = `
+      mutation {
+        createCharacter(input: {
+          planetId: ${planet.id},
+          episodeIds: [${episodes[0].id}, ${episodes[1].id}]
+        }) {
+          id
+          name
+        }
+      }
+    `;
+    const response = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({ query: mutation });
+
+    expect(response.status).toBe(400);
+    expect(response.body.errors[0].message).toMatch(
+      /Field "CreateCharacterInput.name" of required type "String!" was not provided/,
+    );
+  });
+
   it('should get a character by id with episodes', async () => {
     const character = await prisma.character.create({
       data: {
@@ -102,6 +124,25 @@ describe('Characters CRUD (e2e)', () => {
     expect(response.body.data.character.episodes[1].name).toBe('EMPIRE');
   });
 
+  it('should return error for non-existing character', async () => {
+    const query = `
+      query {
+        character(id: 999) {
+          id
+          name
+        }
+      }
+    `;
+    const response = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({ query });
+
+    expect(response.status).toBe(200);
+    expect(response.body.errors[0].message).toMatch(
+      /Character with ID 999 not found/,
+    );
+  });
+
   it('should update a character', async () => {
     const character = await prisma.character.create({
       data: {
@@ -135,6 +176,25 @@ describe('Characters CRUD (e2e)', () => {
     );
   });
 
+  it('should return error for updating non-existing character', async () => {
+    const mutation = `
+      mutation {
+        updateCharacter(id: 999, input: { name: "Non-existing Character" }) {
+          id
+          name
+        }
+      }
+    `;
+    const response = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({ query: mutation });
+
+    expect(response.status).toBe(200);
+    expect(response.body.errors[0].message).toMatch(
+      /Character with ID 999 does not exist/,
+    );
+  });
+
   it('should delete a character', async () => {
     const character = await prisma.character.create({
       data: {
@@ -164,5 +224,24 @@ describe('Characters CRUD (e2e)', () => {
 
     expect(response.status).toBe(200);
     expect(response.body.data.deleteCharacter.name).toBe('Luke Skywalker');
+  });
+
+  it('should return error for deleting non-existing character', async () => {
+    const mutation = `
+      mutation {
+        deleteCharacter(id: 999) {
+          id
+          name
+        }
+      }
+    `;
+    const response = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({ query: mutation });
+
+    expect(response.status).toBe(200);
+    expect(response.body.errors[0].message).toMatch(
+      /Record to delete does not exist/,
+    );
   });
 });
