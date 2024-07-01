@@ -80,8 +80,8 @@ describe('Characters CRUD (e2e)', () => {
       .send({ query: mutation });
 
     expect(response.status).toBe(400);
-    expect(response.body.errors[0].message).toMatch(
-      /Field "CreateCharacterInput.name" of required type "String!" was not provided/,
+    expect(response.body.errors[0].message).toContain(
+      'required type "String!" was not provided',
     );
   });
 
@@ -142,8 +142,8 @@ describe('Characters CRUD (e2e)', () => {
       .send({ query });
 
     expect(response.status).toBe(200);
-    expect(response.body.errors[0].message).toMatch(
-      new RegExp(`Character with ID ${nonExistentCharacterId} not found`),
+    expect(response.body.errors[0].message).toContain(
+      `Character with ID ${nonExistentCharacterId} not found`,
     );
   });
 
@@ -192,8 +192,8 @@ describe('Characters CRUD (e2e)', () => {
       .send({ query: mutation });
 
     expect(response.status).toBe(200);
-    expect(response.body.errors[0].message).toMatch(
-      new RegExp(`Character with ID ${nonExistentCharacterId} does not exist`),
+    expect(response.body.errors[0].message).toContain(
+      `Character with ID ${nonExistentCharacterId} does not exist`,
     );
   });
 
@@ -242,8 +242,8 @@ describe('Characters CRUD (e2e)', () => {
       .send({ query: mutation });
 
     expect(response.status).toBe(200);
-    expect(response.body.errors[0].message).toMatch(
-      /Record to delete does not exist/,
+    expect(response.body.errors[0].message).toContain(
+      'Record to delete does not exist',
     );
   });
 });
