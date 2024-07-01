@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { CharactersRepositoryInterface } from '../characters.repository.interface';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { CursorPaginationArgs } from 'src/common/pagination/dto/cursor-pagination.args';
-import { PaginatedCharacters } from 'src/characters/dto/paginated-characters';
-import { Character } from 'src/characters/models/character.model';
+import { PrismaService } from '../../../prisma/prisma.service';
+import { CursorPaginationArgs } from '../../../common/pagination/dto/cursor-pagination.args';
+import { PaginatedCharacters } from '../../../characters/dto/paginated-characters';
+import { Character } from '../../../characters/models/character.model';
 
 @Injectable()
 export class CharactersRepository implements CharactersRepositoryInterface {

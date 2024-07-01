@@ -4,7 +4,7 @@ import { CreateCharacterInput } from './dto/create-character.input';
 import { UpdateCharacterInput } from './dto/update-character.input';
 import { Character } from './models/character.model';
 import { PaginatedCharacters } from './dto/paginated-characters';
-import { CursorPaginationArgs } from 'src/common/pagination/dto/cursor-pagination.args';
+import { CursorPaginationArgs } from '../common/pagination/dto/cursor-pagination.args';
 
 @Resolver((of) => Character)
 export class CharactersResolver {

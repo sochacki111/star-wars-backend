@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Character } from './models/character.model';
-import { CursorPaginationArgs } from 'src/common/pagination/dto/cursor-pagination.args';
+import { CursorPaginationArgs } from '../common/pagination/dto/cursor-pagination.args';
 import {
   CharactersRepositoryInterface,
   CharactersRepositorySymbol,

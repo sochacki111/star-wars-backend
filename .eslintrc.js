@@ -9,6 +9,8 @@ module.exports = {
   extends: [
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
+    'plugin:import/errors',
+    'plugin:import/warnings',
   ],
   root: true,
   env: {
@@ -22,6 +24,21 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     'linebreak-style': ['error', 'unix'],
-    '@typescript-eslint/no-unused-vars': ['warn', { 'argsIgnorePattern': '^_' }],
+    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+    'import/no-absolute-path': 'error',
+    'import/no-unresolved': 'error',
+    'no-restricted-imports': [
+      'error',
+      {
+        patterns: ['src/*'],
+      },
+    ],
+  },
+  settings: {
+    'import/resolver': {
+      node: {
+        extensions: ['.js', '.ts'],
+      },
+    },
   },
 };
