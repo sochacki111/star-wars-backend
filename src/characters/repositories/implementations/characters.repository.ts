@@ -25,7 +25,9 @@ export class CharactersRepository implements CharactersRepositoryInterface {
     let nextCursor;
     if (characters.length > limit) {
       const nextCharacter = characters.pop();
-      nextCursor = nextCharacter.id.toString();
+      if (nextCharacter) {
+        nextCursor = nextCharacter.id.toString();
+      }
     }
 
     return { items: characters, nextCursor };
@@ -43,14 +45,12 @@ export class CharactersRepository implements CharactersRepositoryInterface {
 
     return this.mapCharacter(character);
   }
-
   async create(data: {
     name: string;
     episodeIds: number[];
     planetId?: number;
   }): Promise<Character> {
     const { name, episodeIds, planetId } = data;
-
     const existingCharacter = await this.prisma.character.findUnique({
       where: { name },
     });
@@ -90,27 +90,7 @@ export class CharactersRepository implements CharactersRepositoryInterface {
     return this.mapCharacter(character);
   }
 
-  private mapCharacter = (
-    character: {
-      planet: {
-        id: number;
-        name: string;
-      };
-      episodes: ({
-        episode: {
-          id: number;
-          name: string;
-        };
-      } & {
-        characterId: number;
-        episodeId: number;
-      })[];
-    } & {
-      id: number;
-      name: string;
-      planetId: number;
-    },
-  ): Character => ({
+  private mapCharacter = (character): Character => ({
     ...character,
     episodes: character.episodes.map((episode) => ({
       id: episode.episode.id,

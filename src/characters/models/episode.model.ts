@@ -3,8 +3,8 @@ import { ObjectType, Field, Int } from '@nestjs/graphql';
 @ObjectType()
 export class EpisodeSummary {
   @Field((type) => Int)
-  id: number;
+  id!: number;
 
   @Field()
-  name: string;
+  name!: string;
 }

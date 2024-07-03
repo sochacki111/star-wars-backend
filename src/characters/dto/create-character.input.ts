@@ -5,12 +5,12 @@ import { IsString, IsUUID, IsOptional, IsArray, IsInt } from 'class-validator';
 export class CreateCharacterInput {
   @Field()
   @IsString()
-  name: string;
+  name!: string;
 
   @Field((type) => [Int])
   @IsArray()
   @IsInt({ each: true })
-  episodeIds: number[];
+  episodeIds!: number[];
 
   @Field((type) => Int, { nullable: true })
   @IsOptional()

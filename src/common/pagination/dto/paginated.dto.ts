@@ -5,7 +5,7 @@ export function Paginated<ItemType>(ItemTypeClass: Type<ItemType>) {
   @ObjectType({ isAbstract: true })
   abstract class PaginatedAbstractClass {
     @Field(() => [ItemTypeClass])
-    items: ItemType[];
+    items!: ItemType[];
 
     @Field(() => String, { nullable: true })
     nextCursor?: string;

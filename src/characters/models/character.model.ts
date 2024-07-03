@@ -5,13 +5,13 @@ import { Planet } from './planet.model';
 @ObjectType({ description: 'Character from Star Wars' })
 export class Character {
   @Field((type) => Int)
-  id: number;
+  id!: number;
 
   @Field()
-  name: string;
+  name!: string;
 
   @Field((type) => [EpisodeSummary])
-  episodes: EpisodeSummary[];
+  episodes!: EpisodeSummary[];
 
   @Field((type) => Planet, { nullable: true })
   planet?: Planet;
