@@ -4,6 +4,9 @@ import { PrismaService } from '../../../prisma/prisma.service';
 import { CursorPaginationArgs } from '../../../common/pagination/dto/cursor-pagination.args';
 import { PaginatedCharacters } from '../../../characters/dto/paginated-characters';
 import { Character } from '../../../characters/models/character.model';
+import { Prisma } from '@prisma/client';
+
+export type PrismaTransactionalClient = Prisma.TransactionClient;
 
 @Injectable()
 export class CharactersRepository implements CharactersRepositoryInterface {
@@ -100,6 +103,37 @@ export class CharactersRepository implements CharactersRepositoryInterface {
     })),
   });
 
+  private async updateGuard(data) {
+    const { id, planetId, episodeIds, prisma } = data;
+
+    const existingCharacter = await prisma.character.findUnique({
+      where: { id },
+    });
+
+    if (!existingCharacter) {
+      throw new Error(`Character with ID ${id} does not exist.`);
+    }
+
+    if (episodeIds) {
+      const episodes = await prisma.episode.findMany({
+        where: { id: { in: episodeIds } },
+      });
+
+      if (episodes.length !== episodeIds.length) {
+        throw new Error(`One or more episode IDs are invalid.`);
+      }
+    }
+
+    if (planetId) {
+      const planet = await prisma.planet.findUnique({
+        where: { id: planetId },
+      });
+      if (!planet) {
+        throw new Error(`Planet with ID ${planetId} does not exist.`);
+      }
+    }
+  }
+
   async update(
     id: number,
     data: { name?: string; episodeIds?: number[]; planetId?: number },
@@ -107,32 +141,34 @@ export class CharactersRepository implements CharactersRepositoryInterface {
     const { name, episodeIds, planetId } = data;
 
     return this.prisma.$transaction(async (prisma) => {
-      const existingCharacter = await prisma.character.findUnique({
-        where: { id },
-      });
+      // const existingCharacter = await prisma.character.findUnique({
+      //   where: { id },
+      // });
 
-      if (!existingCharacter) {
-        throw new Error(`Character with ID ${id} does not exist.`);
-      }
+      // if (!existingCharacter) {
+      //   throw new Error(`Character with ID ${id} does not exist.`);
+      // }
 
-      if (episodeIds) {
-        const episodes = await prisma.episode.findMany({
-          where: { id: { in: episodeIds } },
-        });
+      // if (episodeIds) {
+      //   const episodes = await prisma.episode.findMany({
+      //     where: { id: { in: episodeIds } },
+      //   });
 
-        if (episodes.length !== episodeIds.length) {
-          throw new Error(`One or more episode IDs are invalid.`);
-        }
-      }
+      //   if (episodes.length !== episodeIds.length) {
+      //     throw new Error(`One or more episode IDs are invalid.`);
+      //   }
+      // }
 
-      if (planetId) {
-        const planet = await prisma.planet.findUnique({
-          where: { id: planetId },
-        });
-        if (!planet) {
-          throw new Error(`Planet with ID ${planetId} does not exist.`);
-        }
-      }
+      // if (planetId) {
+      //   const planet = await prisma.planet.findUnique({
+      //     where: { id: planetId },
+      //   });
+      //   if (!planet) {
+      //     throw new Error(`Planet with ID ${planetId} does not exist.`);
+      //   }
+      // }
+
+      await this.updateGuard({ ...data, prisma });
 
       const character = await prisma.character.update({
         where: { id },
